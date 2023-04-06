@@ -19,13 +19,19 @@ body{
 button{
     font-size: 3vw;
     height: 120px;
-    width: 160px;
+    width: 400px;
     background-color: #003566;
     color: #FFC300;
 }
 
 .numbers{
-    display: grid;
-    grid-template: repeat(5, 120px)/ repeat(5, 160px);
-    grid-area: 1/1/6/6
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
+.functions{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
 }

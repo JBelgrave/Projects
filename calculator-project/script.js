@@ -10,7 +10,6 @@ const button6 = document.getElementById("6")
 const button7 = document.getElementById("7")
 const button8 = document.getElementById("8")
 const button9 = document.getElementById("9")
-const buttonDot = document.getElementById(".")
 
 const buttonAdd = document.getElementById("+")
 const buttonSubtract = document.getElementById("-")
@@ -23,7 +22,8 @@ const buttonClearAll = document.getElementById("AC")
 const buttonEquals = document.getElementById("=")
 
 
-const numberButtons = document.addEventListener("click", (event) => {
+/*number buttons*/
+document.addEventListener("click", (event) => {
     if (event.target === button0) {
         if (display.innerText == "0") {
             display.innerText = "0";
@@ -84,30 +84,21 @@ const numberButtons = document.addEventListener("click", (event) => {
         } else {
             display.innerText += "9";
         }
-    } else if (event.target === buttonDot) {
-        if (display.innerText == "0") {
-            display.innerText = ".";
-        } else if (display.innerText.includes(".")) {
-            return false
-        } else {
-            display.innerText += "."
-        }
     }
 })
 
-const mathButtons = document.addEventListener("click", (event) => {
+/*math buttons*/
+document.addEventListener("click", (event) => {
     if (event.target === buttonAdd) {
         if (display.innerText == "0") {
             return false
-        } else if (display.innerText[display.innerText.length-1] == "+") {
+        } else if (display.innerText[display.innerText.length - 1] == "+") {
             return false
-        } else if (display.innerText[display.innerText.length-1] == "-") {
+        } else if (display.innerText[display.innerText.length - 1] == "-") {
             return false
-        } else if (display.innerText[display.innerText.length-1] == "/") {
+        } else if (display.innerText[display.innerText.length - 1] == "/") {
             return false
-        } else if (display.innerText[display.innerText.length-1] == "*") {
-            return false
-        } else if (display.innerText[display.innerText.length-1] == ".") {
+        } else if (display.innerText[display.innerText.length - 1] == "*") {
             return false
         } else {
             display.innerText += "+"
@@ -115,15 +106,13 @@ const mathButtons = document.addEventListener("click", (event) => {
     } else if (event.target === buttonSubtract) {
         if (display.innerText == "0") {
             return false
-        } else if (display.innerText[display.innerText.length-1] == "+") {
+        } else if (display.innerText[display.innerText.length - 1] == "+") {
             return false
-        } else if (display.innerText[display.innerText.length-1] == "-") {
+        } else if (display.innerText[display.innerText.length - 1] == "-") {
             return false
-        } else if (display.innerText[display.innerText.length-1] == "/") {
+        } else if (display.innerText[display.innerText.length - 1] == "/") {
             return false
-        } else if (display.innerText[display.innerText.length-1] == "*") {
-            return false
-        } else if (display.innerText[display.innerText.length-1] == ".") {
+        } else if (display.innerText[display.innerText.length - 1] == "*") {
             return false
         } else {
             display.innerText += "-"
@@ -131,15 +120,13 @@ const mathButtons = document.addEventListener("click", (event) => {
     } else if (event.target === buttonDivide) {
         if (display.innerText == "0") {
             return false
-        } else if (display.innerText[display.innerText.length-1] == "+") {
+        } else if (display.innerText[display.innerText.length - 1] == "+") {
             return false
-        } else if (display.innerText[display.innerText.length-1] == "-") {
+        } else if (display.innerText[display.innerText.length - 1] == "-") {
             return false
-        } else if (display.innerText[display.innerText.length-1] == "/") {
+        } else if (display.innerText[display.innerText.length - 1] == "/") {
             return false
-        } else if (display.innerText[display.innerText.length-1] == "*") {
-            return false
-        } else if (display.innerText[display.innerText.length-1] == ".") {
+        } else if (display.innerText[display.innerText.length - 1] == "*") {
             return false
         } else {
             display.innerText += "/"
@@ -147,15 +134,13 @@ const mathButtons = document.addEventListener("click", (event) => {
     } else if (event.target === buttonMultiply) {
         if (display.innerText == "0") {
             return false
-        } else if (display.innerText[display.innerText.length-1] == "+") {
+        } else if (display.innerText[display.innerText.length - 1] == "+") {
             return false
-        } else if (display.innerText[display.innerText.length-1] == "-") {
+        } else if (display.innerText[display.innerText.length - 1] == "-") {
             return false
-        } else if (display.innerText[display.innerText.length-1] == "/") {
+        } else if (display.innerText[display.innerText.length - 1] == "/") {
             return false
-        } else if (display.innerText[display.innerText.length-1] == "*") {
-            return false
-        } else if (display.innerText[display.innerText.length-1] == ".") {
+        } else if (display.innerText[display.innerText.length - 1] == "*") {
             return false
         } else {
             display.innerText += "*"
@@ -163,23 +148,47 @@ const mathButtons = document.addEventListener("click", (event) => {
     }
 })
 
-const clearButtons = document.addEventListener("click", (event) => {
+/*clear buttons*/
+document.addEventListener("click", (event) => {
     if (event.target === buttonBack) {
-        if(display.innerText == "0") {
+        if (display.innerText == "0") {
             return false
-        } else if(display.innerText.length === 1) {
+        } else if (display.innerText.length === 1) {
             display.innerText = "0"
         } else {
-            display.innerText = display.innerText.substring(0, display.innerText.length-1)
+            display.innerText = display.innerText.substring(0, display.innerText.length - 1)
         }
     } else if (event.target === buttonClearAll) {
         display.innerText = "0"
     }
 })
 
-//Equals
-//Take in given expression
-//convert all numbers from display string to numbers
-//preform operation needed
-//convert result of operation back to string
-//set result string to display inner text
+buttonEquals.addEventListener("click", (event) => {
+    if (event.target === buttonEquals) {
+        const expression = display.innerText;
+        const expressionArray = expression.split(/(\+|\-|\*|\/)/);
+        let result = parseInt(expressionArray[0]);
+
+        for (let i = 1; i < expressionArray.length; i += 2) {
+            const num = parseInt(expressionArray[i + 1]);
+            console.log(num)
+            switch (expressionArray[i]) {
+                case "+":
+                    result += num;
+                    break;
+                case "-":
+                    result -= num;
+                    break;
+                case "*":
+                    result *= num;
+                    break;
+                case "/":
+                    result /= num;
+                    break;
+                default:
+                    break;
+            }
+        }
+        display.innerText = result.toString();
+    }
+});
