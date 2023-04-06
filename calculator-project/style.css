@@ -1,8 +1,16 @@
+body{
+ background-color: #001D3D;
+}
 #display{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    text-indent: 20px;
     height: 235px;
     width: 661;
     border-radius: 40px;
-    font-size: 60px;
-    background-color: #001D3D;
+    font-size: 100px;
+    margin: 20px;
+    background-color: #003566;
     color: #FFC300;
 }
