@@ -27,11 +27,17 @@ document.addEventListener("click", (event) => {
     if (event.target === button0) {
         if (display.innerText == "0") {
             display.innerText = "0";
+        } else if (display.innerText == "NaN") {
+            display.innerText = "0";
         } else {
             display.innerText += "0";
         }
+        button0.style.color = "#FFC300"
+        button0.style.backgroundColor = "#003566"
     } else if (event.target === button1) {
         if (display.innerText == "0") {
+            display.innerText = "1";
+        } else if (display.innerText == "NaN") {
             display.innerText = "1";
         } else {
             display.innerText += "1";
@@ -39,11 +45,15 @@ document.addEventListener("click", (event) => {
     } else if (event.target === button2) {
         if (display.innerText == "0") {
             display.innerText = "2";
+        } else if (display.innerText == "NaN") {
+            display.innerText = "2";
         } else {
             display.innerText += "2";
         }
     } else if (event.target === button3) {
         if (display.innerText == "0") {
+            display.innerText = "3";
+        } else if (display.innerText == "NaN") {
             display.innerText = "3";
         } else {
             display.innerText += "3";
@@ -51,11 +61,15 @@ document.addEventListener("click", (event) => {
     } else if (event.target === button4) {
         if (display.innerText == "0") {
             display.innerText = "4";
+        } else if (display.innerText == "NaN") {
+            display.innerText = "4";
         } else {
             display.innerText += "4";
         }
     } else if (event.target === button5) {
         if (display.innerText == "0") {
+            display.innerText = "5";
+        } else if (display.innerText == "NaN") {
             display.innerText = "5";
         } else {
             display.innerText += "5";
@@ -63,11 +77,15 @@ document.addEventListener("click", (event) => {
     } else if (event.target === button6) {
         if (display.innerText == "0") {
             display.innerText = "6";
+        } else if (display.innerText == "NaN") {
+            display.innerText = "6";
         } else {
             display.innerText += "6";
         }
     } else if (event.target === button7) {
         if (display.innerText == "0") {
+            display.innerText = "7";
+        } else if (display.innerText == "NaN") {
             display.innerText = "7";
         } else {
             display.innerText += "7";
@@ -75,11 +93,15 @@ document.addEventListener("click", (event) => {
     } else if (event.target === button8) {
         if (display.innerText == "0") {
             display.innerText = "8";
+        } else if (display.innerText == "NaN") {
+            display.innerText = "8";
         } else {
             display.innerText += "8";
         }
     } else if (event.target === button9) {
         if (display.innerText == "0") {
+            display.innerText = "9";
+        } else if (display.innerText == "NaN") {
             display.innerText = "9";
         } else {
             display.innerText += "9";
@@ -91,7 +113,7 @@ document.addEventListener("click", (event) => {
 document.addEventListener("click", (event) => {
     if (event.target === buttonAdd) {
         if (display.innerText == "0") {
-            return false
+            display.innerText += "+"
         } else if (display.innerText[display.innerText.length - 1] == "+") {
             return false
         } else if (display.innerText[display.innerText.length - 1] == "-") {
@@ -99,13 +121,15 @@ document.addEventListener("click", (event) => {
         } else if (display.innerText[display.innerText.length - 1] == "/") {
             return false
         } else if (display.innerText[display.innerText.length - 1] == "*") {
+            return false
+        } else if (display.innerText == "NaN") {
             return false
         } else {
             display.innerText += "+"
         }
     } else if (event.target === buttonSubtract) {
         if (display.innerText == "0") {
-            return false
+            display.innerText += "-"
         } else if (display.innerText[display.innerText.length - 1] == "+") {
             return false
         } else if (display.innerText[display.innerText.length - 1] == "-") {
@@ -113,13 +137,15 @@ document.addEventListener("click", (event) => {
         } else if (display.innerText[display.innerText.length - 1] == "/") {
             return false
         } else if (display.innerText[display.innerText.length - 1] == "*") {
+            return false
+        } else if (display.innerText == "NaN") {
             return false
         } else {
             display.innerText += "-"
         }
     } else if (event.target === buttonDivide) {
         if (display.innerText == "0") {
-            return false
+            display.innerText += "/"
         } else if (display.innerText[display.innerText.length - 1] == "+") {
             return false
         } else if (display.innerText[display.innerText.length - 1] == "-") {
@@ -127,13 +153,15 @@ document.addEventListener("click", (event) => {
         } else if (display.innerText[display.innerText.length - 1] == "/") {
             return false
         } else if (display.innerText[display.innerText.length - 1] == "*") {
+            return false
+        } else if (display.innerText == "NaN") {
             return false
         } else {
             display.innerText += "/"
         }
     } else if (event.target === buttonMultiply) {
         if (display.innerText == "0") {
-            return false
+            display.innerText += "*"
         } else if (display.innerText[display.innerText.length - 1] == "+") {
             return false
         } else if (display.innerText[display.innerText.length - 1] == "-") {
@@ -141,6 +169,8 @@ document.addEventListener("click", (event) => {
         } else if (display.innerText[display.innerText.length - 1] == "/") {
             return false
         } else if (display.innerText[display.innerText.length - 1] == "*") {
+            return false
+        } else if (display.innerText == "NaN") {
             return false
         } else {
             display.innerText += "*"
@@ -155,6 +185,8 @@ document.addEventListener("click", (event) => {
             return false
         } else if (display.innerText.length === 1) {
             display.innerText = "0"
+        } else if (display.innerText == "NaN") {
+            display.innerText = "0";
         } else {
             display.innerText = display.innerText.substring(0, display.innerText.length - 1)
         }
@@ -163,12 +195,13 @@ document.addEventListener("click", (event) => {
     }
 })
 
+/*equals button*/
 buttonEquals.addEventListener("click", (event) => {
     if (event.target === buttonEquals) {
         const expression = display.innerText;
         const expressionArray = expression.split(/(\+|\-|\*|\/)/);
         let result = parseInt(expressionArray[0]);
-
+        
         for (let i = 1; i < expressionArray.length; i += 2) {
             const num = parseInt(expressionArray[i + 1]);
             console.log(num)
