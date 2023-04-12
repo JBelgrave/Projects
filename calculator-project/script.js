@@ -10,6 +10,7 @@ const button6 = document.getElementById("6")
 const button7 = document.getElementById("7")
 const button8 = document.getElementById("8")
 const button9 = document.getElementById("9")
+const buttonDot = document.getElementById(".")
 
 const buttonAdd = document.getElementById("+")
 const buttonSubtract = document.getElementById("-")
@@ -32,8 +33,6 @@ document.addEventListener("click", (event) => {
         } else {
             display.innerText += "0";
         }
-        button0.style.color = "#FFC300"
-        button0.style.backgroundColor = "#003566"
     } else if (event.target === button1) {
         if (display.innerText == "0") {
             display.innerText = "1";
@@ -105,6 +104,16 @@ document.addEventListener("click", (event) => {
             display.innerText = "9";
         } else {
             display.innerText += "9";
+        }
+    } else if (event.target === buttonDot) {
+        if (display.innerText == "0") {
+            display.innerText = "."
+        } else if (display.innerText == "NaN") {
+            display.innerText = "."
+        } else if(display.innerText[display.innerText.length - 1] == "."){
+            return false
+        } else {
+            display.innerText += "."
         }
     }
 })
@@ -188,7 +197,10 @@ document.addEventListener("click", (event) => {
         } else if (display.innerText == "NaN") {
             display.innerText = "0";
         } else {
-            display.innerText = display.innerText.substring(0, display.innerText.length - 1)
+            let tempBack = display.innerText.split('')
+            tempBack.pop()
+            display.innerText = tempBack.join('')
+            // display.innerText = display.innerText.substring(0, display.innerText.length - 1)
         }
     } else if (event.target === buttonClearAll) {
         display.innerText = "0"
@@ -198,13 +210,11 @@ document.addEventListener("click", (event) => {
 /*equals button*/
 buttonEquals.addEventListener("click", (event) => {
     if (event.target === buttonEquals) {
-        const expression = display.innerText;
-        const expressionArray = expression.split(/(\+|\-|\*|\/)/);
-        let result = parseInt(expressionArray[0]);
-        
+        const expressionArray = display.innerText.split(/(\+|\-|\*|\/)/);
+        let result = parseFloat(expressionArray[0]);
+
         for (let i = 1; i < expressionArray.length; i += 2) {
-            const num = parseInt(expressionArray[i + 1]);
-            console.log(num)
+            const num = parseFloat(expressionArray[i + 1]);
             switch (expressionArray[i]) {
                 case "+":
                     result += num;
@@ -218,10 +228,8 @@ buttonEquals.addEventListener("click", (event) => {
                 case "/":
                     result /= num;
                     break;
-                default:
-                    break;
             }
         }
-        display.innerText = result.toString();
+        display.innerText = result;
     }
 });
