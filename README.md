@@ -1,1 +1,3 @@
-#<a href="https://github.com/JBelgrave/Projects/blob/main/calculator-project/">Calculator Project</a>
+<h1>
+  <a href="https://jbelgrave.github.io/Projects/calculator-project/">Calculator Project</a>
+</h1>
