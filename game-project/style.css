@@ -12,3 +12,9 @@ canvas {
     display: block;
     margin: 0 auto;
 }
+
+#score{
+    font-size: 72px;
+    display:flex;
+    justify-content: center;
+}
