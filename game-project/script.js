@@ -1,361 +1,264 @@
-const canvas = document.querySelector('canvas');
-const ctx = canvas.getContext("2d");
-const ammo = [];
-const enemyAmmo = [];
-const enemyQueue = [];
-
+const canvas = document.querySelector('canvas')
+const ctx = canvas.getContext('2d')
+const startElement = document.querySelector('#startElement')
+const startGameButton = document.querySelector('#startGameButton')
+const scoreElement = document.querySelector('#scoreElement')
+const endScore = document.querySelector('#endScore')
+canvas.width = innerWidth
+canvas.height = innerHeight
+const friction = 0.98
+let score = 0
+let animationId = null
 function getRotationTo(a, b) {
     return Math.atan2(a.y - b.y, b.x - a.x);
 };
-function drawEnemyElement(obj) {
-    ctx.fillStyle = obj.color;
-    ctx.fillRect(obj.x, obj.y, obj.size, obj.size);
-};
-function drawPlayerElement(obj) {
-    ctx.fillStyle = obj.color;
-    ctx.beginPath();
-    ctx.arc(obj.x, obj.y, obj.radius, obj.startAngle, obj.endAngle, obj.counterclockwise);
-    ctx.fill();
-};
-function clearScreen() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-};
-function rngMachine(variable) {
-    return Math.floor(Math.random() * variable)
-};
-function spawnLogic(obj, arr) {
-    if(Math.random() >= 0.5) {
-        arr.push(obj)
+const mouse = {x: 0, y: 0,};
+class Player {
+    constructor(x, y, radius, color) {
+        this.x = x
+        this.y = y
+        this.radius = radius
+        this.color = color
     }
-};
-
-
-const mouse = {
-    x: 0,
-    y: 0,
-    radius: 5,
-    startAngle: 0,
-    endAngle: 2 * Math.PI,
-    counterclockwise: false,
-    color: 'blue'
-};
-let player = {
-    hp: 20,
-    x: 500,
-    y: 900,
-    radius: 15,
-    startAngle: 0,
-    endAngle: 2 * Math.PI,
-    counterclockwise: false,
-    color: 'red',
-    speed: 2.5,
-    canShoot: true,
-    onSpawn() {
-        if (player.up && player.y > 30) {
-            player.y -= player.speed
-        }
-        if (player.left && player.x > 30) {
-            player.x -= player.speed
-        }
-        if (player.right && player.x < 970) {
-            player.x += player.speed
-        }
-        if (player.down && player.y < 970) {
-            player.y += player.speed
-        }
+    draw() {
+        ctx.beginPath()
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+        ctx.fillStyle = this.color
+        ctx.fill()
     }
-};
-class PlayerShotMid {
-    constructor() {
-        this.color = 'yellow';
-        this.x = player.x;
-        this.y = player.y;
-        this.radius = 10;
-        this.startAngle = 0;
-        this.endAngle = 2 * Math.PI;
-        this.counterclockwise = false;
-        this.speed = 5;
-        this.damage = 1
-        this.rotation = getRotationTo(player, mouse);
-        ammo.push(this);
-    };
-    onSpawn() {
-        this.x += this.speed * Math.cos(this.rotation);
-        this.y -= this.speed * Math.sin(this.rotation);
-    };
-};
-class PlayerShotRight {
-    constructor() {
-        this.color = 'yellow';
-        this.x = player.x+10;
-        this.y = player.y;
-        this.radius = 10;
-        this.startAngle = 0;
-        this.endAngle = 2 * Math.PI;
-        this.counterclockwise = false;
-        this.speed = 5;
-        this.damage = 1
-        this.rotation = getRotationTo(player, mouse);
-        ammo.push(this);
-    };
-    onSpawn() {
-        this.x += this.speed * Math.cos(this.rotation)+.3;
-        this.y -= this.speed * Math.sin(this.rotation);
-    };
-};
-class PlayerShotLeft {
-    constructor() {
-        this.color = 'yellow';
-        this.x = player.x-10;
-        this.y = player.y;
-        this.radius = 10;
-        this.startAngle = 0;
-        this.endAngle = 2 * Math.PI;
-        this.counterclockwise = false;
-        this.speed = 5;
-        this.damage = 1
-        this.rotation = getRotationTo(player, mouse);
-        ammo.push(this);
-    };
-    onSpawn() {
-        this.x += this.speed * Math.cos(this.rotation)-.3;
-        this.y -= this.speed * Math.sin(this.rotation);
-    };
-};
-
-let enemyA = {
-    hp: 15,
-    x: rngMachine(950),
-    y: rngMachine(950),
-    size: 30,
-    speed: .5,
-    color: 'blue',
-    canShoot: null,
     movement() {
-        if (this.y < player.y) {
-            this.y += this.speed
+        if (player.up && player.y >= 50) {
+            player.y -= 2.5
         }
-        if (this.y > player.y) {
-            this.y -= this.speed
+        if (player.down && player.y <= canvas.height - 50) {
+            player.y += 2.5
         }
-        if (this.x < player.x) {
-            this.x += this.speed
+        if (player.left && player.x >= 50) {
+            player.x -= 2.5
         }
-        if (this.x > player.x) {
-            this.x -= this.speed
-        }
-    },
-    collision() {
-        if (this.y > 30) {
-            this.y -= this.speed
-        }
-        if (this.x > 30) {
-            this.x -= this.speed
-        }
-        if (this.x < 970) {
-            this.x += this.speed
-        }
-        if (this.y < 970) {
-            this.y += this.speed
+        if (player.right && player.x <= canvas.width - 50) {
+            player.x += 2.5
         }
     }
-};
-let enemyB = {
-    hp: 20,
-    x: rngMachine(950),
-    y: rngMachine(950),
-    size: 30,
-    speed: .9,
-    color: 'pink',
-    canShoot: null,
-    movement() {
-        if (this.y < player.y) {
-            this.y += this.speed
-        }
-        if (this.y > player.y) {
-            this.y -= this.speed
-        }
-        if (this.x < player.x) {
-            this.x += this.speed
-        }
-        if (this.x > player.x) {
-            this.x -= this.speed
-        }
-    },
-    collision() {
-        if (this.y > 30) {
-            this.y -= this.speed
-        }
-        if (this.x > 30) {
-            this.x -= this.speed
-        }
-        if (this.x < 970) {
-            this.x += this.speed
-        }
-        if (this.y < 970) {
-            this.y += this.speed
-        }
-    }
-};
-let enemyC = {
-    hp: 10,
-    x: rngMachine(950),
-    y: rngMachine(950),
-    size: 30,
-    speed: 1.5,
-    color: 'orange',
-    canShoot: null,
-    movement() {
-        if (this.y < player.y) {
-            this.y += this.speed
-        }
-        if (this.y > player.y) {
-            this.y -= this.speed
-        }
-        if (this.x < player.x) {
-            this.x += this.speed
-        }
-        if (this.x > player.x) {
-            this.x -= this.speed
-        }
-    },
-    collision() {
-        if (this.y > 30) {
-            this.y -= this.speed
-        }
-        if (this.x > 30) {
-            this.x -= this.speed
-        }
-        if (this.x < 970) {
-            this.x += this.speed
-        }
-        if (this.y < 970) {
-            this.y += this.speed
-        }
-    }
-};
-let boss = {
-    hp: 50,
-    x: rngMachine(950),
-    y: rngMachine(950),
-    size: 100,
-    speed: 1,
-    color: 'maroon',
-    canShoot: null,
-    movement() {
-        if (this.y < player.y) {
-            this.y += this.speed
-        }
-        if (this.y > player.y) {
-            this.y -= this.speed
-        }
-        if (this.x < player.x) {
-            this.x += this.speed
-        }
-        if (this.x > player.x) {
-            this.x -= this.speed
-        }
-    },
-    collision() {
-        if (this.y > 30) {
-            this.y -= this.speed
-        }
-        if (this.x > 30) {
-            this.x -= this.speed
-        }
-        if (this.x < 970) {
-            this.x += this.speed
-        }
-        if (this.y < 970) {
-            this.y += this.speed
-        }
-    }
-};
-
-spawnLogic(enemyA, enemyQueue)
-spawnLogic(enemyB, enemyQueue)
-spawnLogic(enemyC, enemyQueue)
-spawnLogic(boss, enemyQueue)
-
-if(enemyQueue.length === 0) {
-    enemyQueue.push(boss)
 }
-enemyQueue.forEach(enemy => {
-    if(enemyQueue.includes(enemy)) {
-        enemy.canShoot = true
-    } else {
-        enemy.canShoot = false
+class Projectile {
+    constructor(x, y, radius, color, velocity) {
+        this.x = x
+        this.y = y
+        this.radius = radius
+        this.color = color
+        this.velocity = velocity
+        this.rotation = getRotationTo(player, mouse)
     }
-})
+    draw() {
+        ctx.beginPath()
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+        ctx.fillStyle = this.color
+        ctx.fill()
+    }
+    update() {
+        this.draw()
+        this.x += 5 * Math.cos(this.rotation)
+        this.y -= 5 * Math.sin(this.rotation)
+    }
+}
+class Enemy {
+    constructor(x, y, radius, color, velocity) {
+        this.x = x
+        this.y = y
+        this.radius = radius
+        this.color = color
+        this.velocity = velocity
+        this.rotation = getRotationTo(this, player)
+        this.canShoot = true
+    }
+    draw() {
+        ctx.beginPath()
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+        ctx.fillStyle = this.color
+        ctx.fill()
+    }
+    update() {
+        this.draw()
+        this.x += Math.cos(this.rotation)
+        this.y -= Math.sin(this.rotation)
+    }
+}
+class EnemyProjectile {
+    constructor(x, y, radius, color, velocity) {
+        this.x = x
+        this.y = y
+        this.radius = radius
+        this.color = color
+        this.velocity = velocity
+        this.rotation = getRotationTo(this, player)
+    }
+    draw() {
+        ctx.beginPath()
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+        ctx.fillStyle = this.color
+        ctx.fill()
+    }
+    update() {
+        this.draw()
+        this.x += 2 * Math.cos(this.rotation)
+        this.y -= 2 * Math.sin(this.rotation)
+    }
+}
+class Particle {
+    constructor(x, y, radius, color, velocity) {
+        this.x = x
+        this.y = y
+        this.radius = radius
+        this.color = color
+        this.velocity = velocity
+        this.alpha = 1
+    }
+    draw() {
+        ctx.save()
+        ctx.globalAlpha = this.alpha
+        ctx.beginPath()
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+        ctx.fillStyle = this.color
+        ctx.fill()
+        ctx.restore()
+    }
+    update() {
+        this.draw()
+        this.velocity.x *= friction
+        this.velocity.y *= friction
+        this.x = this.x + this.velocity.x
+        this.y = this.y + this.velocity.y
+        this.alpha -= 0.01
+    }
+}
+let player = new Player(canvas.width / 2, canvas.height / 2, 10, 'white')
+let projectiles = []
+let enemyProjectiles = []
+let particles = []
+let enemies = []
+function init() {
+    player = new Player(canvas.width / 2, canvas.height / 2, 10, 'white')
+    projectiles = []
+    enemyProjectiles = []
+    particles = []
+    enemies = []
+    score = 0
+    scoreElement.innerHTML = score
+    endScore.innerHTML = score
+}
 
+function spawnEnemies() {
+    setInterval(() => {
+        const radius = Math.random()*(10-20)+20
+        let x = null
+        let y = null
+        if(Math.random() < 0.5) {
+            x = Math.random() < 0.5 ? 0 - radius : canvas.width + radius
+            y = Math.random() * canvas.height
+        } else {
+            x = Math.random() * canvas.width
+            y = Math.random() < 0.5 ? 0 - radius : canvas.height + radius
+        }
+        const color = `hsl(${Math.random()*360}, 50%, 50%)`
+        const angle = Math.atan2(y - player.y, player.x - x)
+        const velocity = {x: Math.cos(angle), y: Math.sin(angle)}
+        enemies.push(new Enemy(x, y, radius, color, velocity))
+    }, 2500);
+}
 
-class EnemyShotA {
-    constructor() {
-        this.color = 'blue';
-        this.x = enemyA.x + 10;
-        this.y = enemyA.y + 5;
-        this.size = 20;
-        this.speed = 7;
-        this.damage = 1;
-        this.rotation = getRotationTo(this, player);
-        enemyAmmo.push(this);
-    };
-    onSpawn() {
-        this.x += this.speed * Math.cos(this.rotation);
-        this.y -= this.speed * Math.sin(this.rotation);
-    };
-};
-class EnemyShotB {
-    constructor() {
-        this.color = 'pink';
-        this.x = enemyB.x + 10;
-        this.y = enemyB.y + 5;
-        this.size = 20
-        this.speed = 4;
-        this.damage = 3;
-        this.rotation = getRotationTo(this, player);
-        enemyAmmo.push(this);
-    };
-    onSpawn() {
-        this.x += this.speed * Math.cos(this.rotation);
-        this.y -= this.speed * Math.sin(this.rotation);
-    };
-};
-class EnemyShotC {
-    constructor() {
-        this.color = 'orange';
-        this.x = enemyC.x + 10;
-        this.y = enemyC.y + 5;
-        this.size = 20
-        this.speed = 7;
-        this.damage = 2.5;
-        this.rotation = getRotationTo(this, player);
-        enemyAmmo.push(this);
-    };
-    onSpawn() {
-        this.x += this.speed * Math.cos(this.rotation);
-        this.y -= this.speed * Math.sin(this.rotation);
-    };
-};
-class BossShot {
-    constructor() {
-        this.color = 'maroon';
-        this.x = boss.x + 10;
-        this.y = boss.y + 5;
-        this.size = 50
-        this.speed = 7;
-        this.damage = 5;
-        this.rotation = getRotationTo(this, player);
-        enemyAmmo.push(this);
-    };
-    onSpawn() {
-        this.x += this.speed * Math.cos(this.rotation);
-        this.y -= this.speed * Math.sin(this.rotation);
-    };
-};
+function animate() {
+    animationId = requestAnimationFrame(animate)
+    ctx.fillStyle = 'rgba(0, 0, 0, .1)'
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
+    player.draw()
+    player.movement()
+    particles.forEach((particle, particleIndex) => {
+        if (particle.alpha <= 0) {
+            particles.splice(particleIndex, 1)
+        } else {
+            particle.update()
+        }
+    })
+    projectiles.forEach((projectile, projectileIndex) => {
+        projectile.update()
+        console.log(projectiles)
+        if (projectile.x + projectile.radius < 0 ||
+            projectile.x - projectile.radius > canvas.width ||
+            projectile.y + projectile.radius < 0 ||
+            projectile.y - projectile.radius > canvas.height) {
+            setTimeout(() => {
+                projectiles.splice(projectileIndex, 1)
+            }, 0);
+        }
+    })
+    enemyProjectiles.forEach((enemyProjectile, enemyProjectileIndex) => {
+        enemyProjectile.update()
+        if (enemyProjectile.x + enemyProjectile.radius < 0 ||
+            enemyProjectile.x - enemyProjectile.radius > canvas.width ||
+            enemyProjectile.y + enemyProjectile.radius < 0 ||
+            enemyProjectile.y - enemyProjectile.radius > canvas.height) {
+            setTimeout(() => {
+                enemyProjectiles.splice(enemyProjectileIndex, 1)
+            }, 0);
+        }
+    })
+    enemies.forEach((enemy, enemyIndex) => {
+        enemy.update()
+        if(enemy.canShoot) {
+            enemyProjectiles.push(new EnemyProjectile(enemy.x, enemy.y, 5, enemy.color, enemyProjectiles.rotation))
+            enemy.canShoot = false
+            setTimeout(() => enemy.canShoot = true, 1000);
+        }
+        const dist = Math.hypot(player.x - enemy.x, player.y - enemy.y)
+        if (dist - enemy.radius - player.radius < 1) {
+            if(hp < 0) {
+                cancelAnimationFrame(animationId)
+                endScore.innerHTML = score
+                startGameButton.innerText = 'Restart'
+                startElement.style.display = 'flex'
+            } else {
+                hp -= 1
+            }
+        }
+        projectiles.forEach((projectile, projectileIndex) => {
+            const dist = Math.hypot(projectile.x - enemy.x, projectile.y - enemy.y)
+            if (dist - enemy.radius - projectile.radius < 1) {
+                if (enemy.radius - 10 > 5) {
+                    score += 100
+                    scoreElement.innerHTML = score
+                    gsap.to(enemy, {radius: enemy.radius - 10})
+                    setTimeout(() => {
+                        projectiles.splice(projectileIndex, 1)
+                    }, 0);
+                } else {
+                    score += 250
+                    scoreElement.innerHTML = score
+                    for (let i = 0; i < 8; i++) {
+                        particles.push(new Particle(projectile.x, projectile.y, Math.random()*(3-1)+1, enemy.color, 
+                        {x: (Math.random() - 0.5)*(Math.random()*8), 
+                        y: (Math.random() - 0.5)*(Math.random()*8)}))
+                    }
+                    setTimeout(() => {
+                        enemies.splice(enemyIndex, 1)
+                        projectiles.splice(projectileIndex, 1)
+                    }, 0);
+                }
+            }
+        })
+        enemyProjectiles.forEach((enemyProjectile) => {
+            const dist = Math.hypot(enemyProjectile.x - player.x, enemyProjectile.y - player.y)
+            if (dist - enemyProjectile.radius - player.radius < 1) {
+                    cancelAnimationFrame(animationId)
+                    endScore.innerHTML = score
+                    startGameButton.innerText = 'Restart'
+                    startElement.style.display = 'flex'
+            }
+        })
+    })
+}
 
-
-window.addEventListener('keydown', e => {
+addEventListener('keydown', e => {
     if (e.key === 'ArrowLeft' || e.key === 'a') {
         player.left = true;
     } else if (e.key === 'ArrowRight' || e.key === 'd') {
@@ -366,7 +269,7 @@ window.addEventListener('keydown', e => {
         player.down = true;
     }
 });
-window.addEventListener('keyup', e => {
+addEventListener('keyup', e => {
     if (e.key === 'ArrowLeft' || e.key === 'a') {
         player.left = false;
     } else if (e.key === 'ArrowRight' || e.key === 'd') {
@@ -377,64 +280,16 @@ window.addEventListener('keyup', e => {
         player.down = false;
     }
 });
-canvas.addEventListener('mousemove', e => {
+addEventListener('mousemove', e => {
     mouse.x = e.offsetX;
     mouse.y = e.offsetY;
 });
-canvas.addEventListener('mousedown', e => {
-    player.clicking = true;
-});
-canvas.addEventListener('mouseup', e => {
-    player.clicking = false;
-});
-
-
-function draw() {
-    clearScreen();
-    enemyAmmo.forEach(obj => {
-        drawEnemyElement(obj);
-        obj.onSpawn();
-    });
-    enemyQueue.forEach(obj => {
-        drawEnemyElement(obj);
-        obj.movement();
-        obj.collision();
-    });
-    ammo.forEach(obj => {
-        drawPlayerElement(obj);
-        obj.onSpawn();
-    });
-    drawPlayerElement(player);
-    player.onSpawn();
-
-    if (enemyA.canShoot) {
-        new EnemyShotA;
-        enemyA.canShoot = false;
-        setTimeout(() => enemyA.canShoot = true, 1200);
-    }
-    if (enemyB.canShoot) {
-        new EnemyShotB;
-        enemyB.canShoot = false;
-        setTimeout(() => enemyB.canShoot = true, 850);
-    }
-    if (enemyC.canShoot) {
-        new EnemyShotC;
-        enemyC.canShoot = false;
-        setTimeout(() => enemyC.canShoot = true, 350);
-    }
-    if (boss.canShoot) {
-        new BossShot;
-        boss.canShoot = false;
-        setTimeout(() => boss.canShoot = true, 500);
-    }
-    
-    if (player.clicking && player.canShoot) {
-        new PlayerShotMid;
-        new PlayerShotRight;
-        new PlayerShotLeft;
-        player.canShoot = false;
-        setTimeout(() => player.canShoot = true, 250);
-    }
-    requestAnimationFrame(draw);
-};
-draw();
+addEventListener('click', () => {
+    projectiles.push(new Projectile(player.x, player.y, 5, 'white', projectiles.rotation))
+})
+startGameButton.addEventListener('click', () => {
+    init()
+    startElement.style.display = 'none'
+    animate()
+    spawnEnemies()
+})
