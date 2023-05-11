@@ -27,17 +27,17 @@ class Player {
         ctx.fill()
     }
     movement() {
-        if (player.up && player.y >= 50) {
-            player.y -= 2.5
+        if (this.up && this.y >= 50) {
+            this.y -= 2.5
         }
-        if (player.down && player.y <= canvas.height - 50) {
-            player.y += 2.5
+        if (this.down && this.y <= canvas.height - 50) {
+            this.y += 2.5
         }
-        if (player.left && player.x >= 50) {
-            player.x -= 2.5
+        if (this.left && this.x >= 50) {
+            this.x -= 2.5
         }
-        if (player.right && player.x <= canvas.width - 50) {
-            player.x += 2.5
+        if (this.right && this.x <= canvas.width - 50) {
+            this.x += 2.5
         }
     }
 }
@@ -132,13 +132,15 @@ class Particle {
         this.alpha -= 0.01
     }
 }
-let player = new Player(canvas.width / 2, canvas.height / 2, 10, 'white')
+let playerInner = new Player(canvas.width / 2, canvas.height / 2, 16, 'black')
+let player = new Player(canvas.width / 2, canvas.height / 2, 20, 'white')
 let projectiles = []
 let enemyProjectiles = []
 let particles = []
 let enemies = []
 function init() {
-    player = new Player(canvas.width / 2, canvas.height / 2, 10, 'white')
+    playerInner = new Player(canvas.width / 2, canvas.height / 2, 16, 'black')
+    player = new Player(canvas.width / 2, canvas.height / 2, 20, 'white')
     projectiles = []
     enemyProjectiles = []
     particles = []
@@ -150,7 +152,7 @@ function init() {
 
 function spawnEnemies() {
     setInterval(() => {
-        const radius = Math.random()*(10-20)+20
+        const radius = Math.random()*(20-80)+80
         let x = null
         let y = null
         if(Math.random() < 0.5) {
@@ -160,11 +162,11 @@ function spawnEnemies() {
             x = Math.random() * canvas.width
             y = Math.random() < 0.5 ? 0 - radius : canvas.height + radius
         }
-        const color = `hsl(${Math.random()*360}, 50%, 50%)`
+        const color = `hsl(${Math.random()*360}, 100%, 75%)`
         const angle = Math.atan2(y - player.y, player.x - x)
         const velocity = {x: Math.cos(angle), y: Math.sin(angle)}
         enemies.push(new Enemy(x, y, radius, color, velocity))
-    }, 2500);
+    }, 800);
 }
 
 function animate() {
@@ -173,6 +175,8 @@ function animate() {
     ctx.fillRect(0, 0, canvas.width, canvas.height)
     player.draw()
     player.movement()
+    playerInner.draw()
+    playerInner.movement()
     particles.forEach((particle, particleIndex) => {
         if (particle.alpha <= 0) {
             particles.splice(particleIndex, 1)
@@ -182,7 +186,6 @@ function animate() {
     })
     projectiles.forEach((projectile, projectileIndex) => {
         projectile.update()
-        console.log(projectiles)
         if (projectile.x + projectile.radius < 0 ||
             projectile.x - projectile.radius > canvas.width ||
             projectile.y + projectile.radius < 0 ||
@@ -206,28 +209,24 @@ function animate() {
     enemies.forEach((enemy, enemyIndex) => {
         enemy.update()
         if(enemy.canShoot) {
-            enemyProjectiles.push(new EnemyProjectile(enemy.x, enemy.y, 5, enemy.color, enemyProjectiles.rotation))
+            enemyProjectiles.push(new EnemyProjectile(enemy.x, enemy.y, 5, 'darkred', enemyProjectiles.rotation))
             enemy.canShoot = false
-            setTimeout(() => enemy.canShoot = true, 1000);
+            setTimeout(() => enemy.canShoot = true, 2500);
         }
         const dist = Math.hypot(player.x - enemy.x, player.y - enemy.y)
         if (dist - enemy.radius - player.radius < 1) {
-            if(hp < 0) {
-                cancelAnimationFrame(animationId)
-                endScore.innerHTML = score
-                startGameButton.innerText = 'Restart'
-                startElement.style.display = 'flex'
-            } else {
-                hp -= 1
-            }
+            cancelAnimationFrame(animationId)
+            endScore.innerHTML = score
+            startGameButton.innerText = 'Restart'
+            startElement.style.display = 'flex'
         }
         projectiles.forEach((projectile, projectileIndex) => {
             const dist = Math.hypot(projectile.x - enemy.x, projectile.y - enemy.y)
             if (dist - enemy.radius - projectile.radius < 1) {
-                if (enemy.radius - 10 > 5) {
+                if (enemy.radius - 20 > 20) {
                     score += 100
                     scoreElement.innerHTML = score
-                    gsap.to(enemy, {radius: enemy.radius - 10})
+                    gsap.to(enemy, {radius: enemy.radius - 20})
                     setTimeout(() => {
                         projectiles.splice(projectileIndex, 1)
                     }, 0);
@@ -261,23 +260,31 @@ function animate() {
 addEventListener('keydown', e => {
     if (e.key === 'ArrowLeft' || e.key === 'a') {
         player.left = true;
+        playerInner.left = true;
     } else if (e.key === 'ArrowRight' || e.key === 'd') {
         player.right = true;
+        playerInner.right = true;
     } else if (e.key === 'ArrowUp' || e.key === 'w') {
         player.up = true;
+        playerInner.up = true;
     } else if (e.key === 'ArrowDown' || e.key === 's') {
         player.down = true;
+        playerInner.down = true;
     }
 });
 addEventListener('keyup', e => {
     if (e.key === 'ArrowLeft' || e.key === 'a') {
         player.left = false;
+        playerInner.left = false;
     } else if (e.key === 'ArrowRight' || e.key === 'd') {
         player.right = false;
+        playerInner.right = false;
     } else if (e.key === 'ArrowUp' || e.key === 'w') {
         player.up = false;
+        playerInner.up = false;
     } else if (e.key === 'ArrowDown' || e.key === 's') {
         player.down = false;
+        playerInner.down = false;
     }
 });
 addEventListener('mousemove', e => {
@@ -285,7 +292,7 @@ addEventListener('mousemove', e => {
     mouse.y = e.offsetY;
 });
 addEventListener('click', () => {
-    projectiles.push(new Projectile(player.x, player.y, 5, 'white', projectiles.rotation))
+    projectiles.push(new Projectile(player.x, player.y, 10, 'white', projectiles.rotation))
 })
 startGameButton.addEventListener('click', () => {
     init()
